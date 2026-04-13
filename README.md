@@ -1,21 +1,38 @@
-# 🎓 Students API
+# 🎓 Students API (Full Stack + Dockerized)
 
-A production-ready REST API built using **Golang**, following clean architecture principles.
-This project demonstrates backend fundamentals like **routing, validation, database integration, structured logging, and graceful shutdown**.
+A **production-ready full-stack application** built using:
+
+* 🟦 **Golang (Backend API)**
+* ⚛️ **React + Vite (Frontend)**
+* 🐳 **Docker & Docker Compose**
+
+This project follows **clean architecture principles** and demonstrates real-world backend + frontend integration with containerization.
 
 ---
 
 ## 🚀 Features
 
+### 🔹 Backend (Golang)
+
 * ✅ Create Student (POST API)
 * ✅ Get All Students (GET API)
 * ✅ Get Student by ID (GET API)
-* ✅ Input Validation using `validator`
-* ✅ JSON Response Handling (Custom Response Utility)
-* ✅ SQLite Database Integration
-* ✅ Structured Logging using `slog`
-* ✅ Graceful Server Shutdown
-* ✅ Clean Architecture (Handler → Storage → Types)
+* ✅ Input Validation (`validator`)
+* ✅ Structured Logging (`slog`)
+* ✅ SQLite Database
+* ✅ Graceful Shutdown
+* ✅ Clean Architecture
+
+### 🔹 Frontend (React + Vite)
+
+* ✅ Fetch & display student data
+* ✅ API integration with backend
+* ✅ Modern UI setup with Vite
+
+### 🔹 DevOps
+
+* 🐳 Dockerized Backend & Frontend
+* 🐳 Docker Compose for multi-service setup
 
 ---
 
@@ -24,23 +41,36 @@ This project demonstrates backend fundamentals like **routing, validation, datab
 ```
 Students-API/
 │
-├── cmd/student-api/        # Entry point (main.go)
-├── internal/
-│   ├── config/             # Config loader (cleanenv)
-│   ├── http/
-│   │   └── handlers/       # API handlers (students)
-│   ├── storage/
-│   │   └── Sqlite/         # DB logic
-│   ├── types/              # Structs (Student)
-│   └── utils/
-│       └── response/       # JSON response helpers
+├── Backend/                        # Golang Backend
+│   ├── cmd/
+│   │   └── student-api/
+│   │       └── main.go            # Entry point
+│   │
+│   ├── config/                    # Config files
+│   ├── internal/
+│   │   ├── config/                # Config loader
+│   │   ├── http/
+│   │   │   └── handlers/          # API handlers
+│   │   ├── storage/
+│   │   │   └── sqlite/            # DB logic
+│   │   ├── types/                 # Structs
+│   │   └── utils/response/        # Response helpers
+│   │
+│   ├── storage/                   # SQLite DB file
+│   ├── go.mod
+│   └── go.sum
 │
-├── config/
-│   ├── local.yaml          # Local config (ignored)
-│   └── example.yaml        # Sample config
+├── Frontend/                      # React Frontend (Vite)
+│   ├── src/
+│   ├── public/
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.js
 │
-├── storage/                # SQLite DB file
-├── go.mod
+├── Dockerfile                     # Backend Dockerfile
+├── docker-compose.yml             # Multi-container setup
+├── .dockerignore
+├── .gitignore
 └── README.md
 ```
 
@@ -48,17 +78,30 @@ Students-API/
 
 ## ⚙️ Tech Stack
 
-* 🟦 Golang (net/http)
-* 🗄️ SQLite
-* 📦 cleanenv (config management)
-* ✅ go-playground/validator (validation)
-* 📊 slog (structured logging)
+### Backend
+
+* Golang (`net/http`)
+* SQLite
+* cleanenv
+* validator
+* slog
+
+### Frontend
+
+* React.js
+* Vite
+* JavaScript
+
+### DevOps
+
+* Docker
+* Docker Compose
 
 ---
 
 ## 🔧 Setup & Installation
 
-### 1️⃣ Clone the repository
+### 1️⃣ Clone Repo
 
 ```bash
 git clone https://github.com/TusharChoudharykp/Students-API.git
@@ -67,30 +110,46 @@ cd Students-API
 
 ---
 
-### 2️⃣ Create config file
+## ▶️ Run Backend Locally
 
 ```bash
-cp config/example.yaml config/local.yaml
-```
-
-Update `local.yaml`:
-
-
----
-
-### 3️⃣ Install dependencies
-
-```bash
+cd Backend
 go mod tidy
-```
-
----
-
-### 4️⃣ Run the server
-
-```bash
 go run ./cmd/student-api/main.go -config config/local.yaml
 ```
+
+---
+
+## ▶️ Run Frontend Locally
+
+```bash
+cd Frontend
+npm install
+npm run dev
+```
+
+Frontend runs on:
+
+```
+http://localhost:5173
+```
+
+---
+
+## 🐳 Run with Docker (Recommended)
+
+### Run full stack using Docker Compose
+
+```bash
+docker-compose up --build
+```
+
+---
+
+### Services:
+
+* Backend → http://localhost:8080
+* Frontend → http://localhost:5173
 
 ---
 
@@ -98,11 +157,9 @@ go run ./cmd/student-api/main.go -config config/local.yaml
 
 ### ➕ Create Student
 
-```http
+```
 POST /api/students
 ```
-
-#### Request Body:
 
 ```json
 {
@@ -116,7 +173,7 @@ POST /api/students
 
 ### 📄 Get All Students
 
-```http
+```
 GET /api/students
 ```
 
@@ -124,15 +181,23 @@ GET /api/students
 
 ### 🔍 Get Student by ID
 
-```http
+```
 GET /api/students/{id}
 ```
 
 ---
 
-## ⚠️ Error Handling
+## 🔗 Frontend ↔ Backend Connection
 
-Standard response format:
+Frontend calls backend APIs like:
+
+```javascript
+fetch("http://localhost:8080/api/students")
+```
+
+---
+
+## ⚠️ Error Handling
 
 ```json
 {
@@ -145,23 +210,23 @@ Standard response format:
 
 ## 🧠 Concepts Covered
 
-* Dependency Injection
-* Clean Architecture
-* REST API Design
-* JSON Encoding/Decoding
-* Database Querying (SQL)
-* Validation Middleware Logic
-* Graceful Shutdown using Context
+* Clean Architecture (Handler → Storage → Types)
+* REST API Development
+* Full Stack Integration
+* Dockerization
+* Graceful Shutdown
+* Validation & Error Handling
 
 ---
 
 ## 🛠️ Future Improvements
 
-* 🔐 Authentication (JWT)
+* 🔐 JWT Authentication
 * 📄 Pagination & Filtering
 * 🧪 Unit Testing
-* 📦 Dockerization
+* 📦 CI/CD (GitHub Actions)
 * ☁️ Deployment (AWS / Kubernetes)
+* 🔍 Search functionality in frontend
 
 ---
 
@@ -169,14 +234,17 @@ Standard response format:
 
 **Tushar Choudhary**
 
-* 💼 Aspiring Backend & Blockchain Developer
 * 🏆 SIH 2023 Winner
-* ⚡ Passionate about scalable systems & DevOps
+* 💼 Backend & Blockchain Developer
+* ⚡ DevOps Enthusiast
 
 ---
 
-## ⭐ If you like this project
+## ⭐ Support
 
-Give it a ⭐ on GitHub and feel free to contribute😊!
+If you like this project:
+
+👉 Star ⭐ the repo
+👉 Fork & contribute
 
 ---
