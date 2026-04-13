@@ -28,9 +28,8 @@ go.work.sum
 .env
 
 
-/storage
-
-config/local.yaml
+Backend/storage
+Backend/config/local.yaml
 
 # Editor/IDE
 # .idea/
