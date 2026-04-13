@@ -1,0 +1,7 @@
+cat > .dockerignore <<EOF
+storage/
+.git
+.gitignore
+*.md
+tmp/
+EOF

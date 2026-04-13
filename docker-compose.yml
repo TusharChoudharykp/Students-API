@@ -1,0 +1,22 @@
+services:
+  app:
+    image: tusharchoudhary2002/students-api:latest
+    container_name: students-api
+
+    ports:
+      - "8080:8080"
+
+    volumes:
+      - student-data:/app/storage
+      - ./config/local.yaml:/app/config/local.yaml
+
+    networks:
+      - students-net
+
+    restart: always
+
+volumes:
+  student-data:
+
+networks:
+  students-net:
