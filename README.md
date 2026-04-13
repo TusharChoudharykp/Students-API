@@ -41,26 +41,39 @@ This project follows **clean architecture principles** and demonstrates real-wor
 ```
 Students-API/
 │
-├── Backend/                        # Golang Backend
+├── Backend/
 │   ├── cmd/
 │   │   └── student-api/
-│   │       └── main.go            # Entry point
+│   │       └── main.go              # Entry point
 │   │
-│   ├── config/                    # Config files
+│   ├── config/
+│   │   └── local.yaml              # Config file
+│   │
 │   ├── internal/
-│   │   ├── config/                # Config loader
 │   │   ├── http/
-│   │   │   └── handlers/          # API handlers
+│   │   │   ├── handlers/
+│   │   │   │   └── students/
+│   │   │   │       └── student.go  # API handlers
+│   │   │   └── middlewares/
+│   │   │       └── cors.go         # CORS middleware
+│   │   │
 │   │   ├── storage/
-│   │   │   └── sqlite/            # DB logic
-│   │   ├── types/                 # Structs
-│   │   └── utils/response/        # Response helpers
+│   │   │   └── sqlite/
+│   │   │       ├── sqlite.go       # DB connection
+│   │   │       └── storage.go      # Queries
+│   │   │
+│   │   ├── types/
+│   │   │   └── types.go            # Structs
+│   │   │
+│   │   └── utils/
+│   │       └── response/
+│   │           └── response.go     # Response helpers
 │   │
 │   ├── storage/                   # SQLite DB file
 │   ├── go.mod
 │   └── go.sum
 │
-├── Frontend/                      # React Frontend (Vite)
+├── Frontend/
 │   ├── src/
 │   ├── public/
 │   ├── index.html
