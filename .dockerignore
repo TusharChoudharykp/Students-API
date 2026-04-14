@@ -5,3 +5,7 @@ storage/
 *.md
 tmp/
 EOF
+
+Frontend/node_modules
+Backend/storage/*.db
+Backend/config/local.yaml
