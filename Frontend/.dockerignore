@@ -1,0 +1,20 @@
+# Reinstalled inside container via npm ci
+node_modules/
+
+# Rebuilt inside container via npm run build
+dist/
+
+# Git
+.git
+.gitignore
+
+# Temp & debug
+tmp/
+*.log
+
+# Docs
+*.md
+
+# Local env
+.env
+.env.*

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getStudents, getStudentById } from "../api/students";
-import StudentForm from "../components/studentForm";
-import StudentList from "../components/studentList";
+import StudentForm from "../components/StudentForm";
+import StudentList from "../components/StudentList";
 import { getInitials, getColor } from "../utils/studentHelpers";
 import "./Home.css";
 
