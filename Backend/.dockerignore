@@ -1,0 +1,15 @@
+# Git
+.git
+.gitignore
+
+# Storage (SQLite data — don't bake into image)
+storage/
+
+# Test files
+*_test.go
+**/*_test.go
+
+# Misc
+*.md
+.env
+.env.*

@@ -1,0 +1,91 @@
+# ─── STAGE 1: Builder ─────────────────────────────────────────────────────────
+
+# Step 1: Use official Go 1.23 Alpine image as builder base
+# Alpine keeps the image small (~300MB vs ~800MB for full Go image)
+FROM golang:1.26-alpine AS builder
+
+# Step 2: Set /app as working directory inside the container
+# All subsequent commands run from here
+WORKDIR /app
+
+# Step 3: Copy ONLY dependency files first (not source code)
+# This is a Docker layer caching trick — if go.mod/go.sum haven't changed,
+# Docker reuses the cached layer and skips re-downloading dependencies
+COPY go.mod go.sum ./
+
+# Step 4: Download all Go module dependencies
+# Runs before copying source so this layer is cached independently
+RUN go mod download
+
+# Step 5: Copy only the source folders the build needs
+# Avoids copying storage/, .git, test files etc. into the build context
+COPY cmd/      ./cmd/
+COPY internal/ ./internal/
+COPY config/   ./config/
+
+# Step 6: Compile the Go binary with production flags
+# CGO_ENABLED=0  → pure Go binary, no C dependencies (required for Alpine)
+# GOOS=linux     → target Linux OS (in case building on Mac/Windows)
+# -ldflags="-s"  → strip symbol table (smaller binary)
+# -ldflags="-w"  → strip DWARF debug info (smaller binary)
+# -o students-api → output binary name
+# ./cmd/student-api/ → entry point package
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -ldflags="-s -w" \
+    -o students-api \
+    ./cmd/student-api/
+
+
+# ─── STAGE 2: Production ──────────────────────────────────────────────────────
+
+# Step 7: Start fresh with minimal Alpine image (no Go toolchain)
+# The builder stage is discarded — only the compiled binary is carried over
+# alpine:3.19 is only ~7MB vs ~300MB for the Go builder image
+FROM alpine:3.19 AS production
+
+# Step 8: Install CA certificates
+# Required if the backend makes any outbound HTTPS calls (APIs, DBs, etc.)
+# Without this, TLS verification fails inside Alpine
+RUN apk add --no-cache ca-certificates
+
+# Step 9: Create a non-root group and user for security
+# Running as root inside a container is a security risk
+# -S → system account (no password, no home dir, no shell)
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Step 10: Set working directory in the production image
+WORKDIR /app
+
+# Step 11: Copy ONLY the compiled binary from the builder stage
+# Nothing else from the builder is included (no Go toolchain, no source code)
+COPY --from=builder /app/students-api .
+
+# Step 12: Set strict permissions on the binary
+# 550 → owner=rx, group=rx, others=none
+# appuser can execute but cannot modify or delete the binary
+RUN chmod 550 students-api
+
+# Step 13: Copy config file from builder stage
+# local.yaml is needed at runtime for DB path, port, env settings etc.
+# In production, override this by mounting a volume (see docker-compose.yml)
+COPY --from=builder /app/config/local.yaml ./config/local.yaml
+
+# Step 14: Create SQLite storage directory and fix all ownership
+# Must be done as root BEFORE switching to appuser
+# chown -R ensures appuser can read/write the storage and config
+RUN mkdir -p /app/storage && chown -R appuser:appgroup /app
+
+# Step 15: Switch to non-root user for all subsequent commands
+# Container now runs as appuser — limits blast radius if container is compromised
+USER appuser
+
+# Step 16: Declare the port the app listens on
+# Informational only — does not actually publish the port
+# Port is published in docker-compose.yml via ports: "8080:8080"
+EXPOSE 8080
+
+
+# Step 18: Run the binary with config flag
+# Uses exec form (JSON array) — not shell form — so signals (SIGTERM)
+# are sent directly to the process, enabling graceful shutdown
+CMD ["./students-api", "-config", "config/local.yaml"]
