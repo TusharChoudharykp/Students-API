@@ -1,22 +1,28 @@
-services:
-  app:
-    image: tusharchoudhary2002/students-api:latest
-    container_name: students-api
+version: "3.8"
 
+services:
+  backend:
+    image: tusharchoudhary2002/students-backend:latest
+    container_name: backend
     ports:
       - "8080:8080"
-
     volumes:
-      - student-data:/app/storage
-      - ./config/local.yaml:/app/config/local.yaml
-
+      - ./Backend/config/local.yaml:/app/config/local.yaml
+      - ./Backend/storage:/app/storage
     networks:
       - students-net
-
     restart: always
 
-volumes:
-  student-data:
+  frontend:
+    image: tusharchoudhary2002/students-frontend:latest
+    container_name: frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - students-net
+    restart: always
 
 networks:
   students-net:
