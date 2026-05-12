@@ -35,6 +35,12 @@ func main() {
 	router.HandleFunc("GET /api/students/{id}", students.GetById(storage))
 	router.HandleFunc("GET /api/students", students.GetAllId(storage))
 
+	// Health check endpoint for Kubernetes probes
+    router.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
+	   w.WriteHeader(http.StatusOK)
+	   w.Write([]byte("OK"))
+    })
+
 	//wrap with your existing CORS middleware
 	server := http.Server{
 		Addr: cfg.Addr,
