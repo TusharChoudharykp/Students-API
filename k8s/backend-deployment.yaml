@@ -4,6 +4,11 @@ metadata:
   name: backend
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   selector:
     matchLabels:
       app: backend
@@ -14,7 +19,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: tusharchoudhary2002/students-backend:latest
+          image: tusharchoudhary2002/students-backend:v2
           ports:
             - containerPort: 8080
 
@@ -68,4 +73,5 @@ spec:
             name: backend-config
 
         - name: storage-volume
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: backend-pvc
