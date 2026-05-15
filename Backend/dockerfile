@@ -21,7 +21,7 @@ RUN go mod download
 # Avoids copying storage/, .git, test files etc. into the build context
 COPY cmd/      ./cmd/
 COPY internal/ ./internal/
-COPY config/   ./config/
+#COPY config/   ./config/
 
 # Step 6: Compile the Go binary with production flags
 # CGO_ENABLED=0  → pure Go binary, no C dependencies (required for Alpine)
@@ -68,7 +68,7 @@ RUN chmod 550 students-api
 # Step 13: Copy config file from builder stage
 # local.yaml is needed at runtime for DB path, port, env settings etc.
 # In production, override this by mounting a volume (see docker-compose.yml)
-COPY --from=builder /app/config/local.yaml ./config/local.yaml
+#COPY --from=builder /app/config/local.yaml ./config/local.yaml
 
 # Step 14: Create SQLite storage directory and fix all ownership
 # Must be done as root BEFORE switching to appuser
